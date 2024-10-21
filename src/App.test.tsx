@@ -1,30 +1,16 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { App } from "./App";
-import { AuthentificationProvider } from "./authentification/context/AuthentificationContext";
+import { render } from "./tests/wrapper";
 
-test("given unauthenticated user it should return not logged in", () => {
+test("it should render properly", () => {
   renderApp();
 
-  const title = screen.getByText("Not logged In");
-
-  expect(title).toBeInTheDocument();
-});
-
-test("given authenticated user it should return Welcome", () => {
-  localStorage.setItem("user", JSON.stringify({ name: "John Doe" }));
-
-  renderApp();
-
-  const title = screen.getByText("Welcome");
+  const title = screen.getByText("Bienvenue!");
 
   expect(title).toBeInTheDocument();
 });
 
 const renderApp = () => {
-  render(
-    <AuthentificationProvider>
-      <App />
-    </AuthentificationProvider>
-  );
+  render(<App />);
 };

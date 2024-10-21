@@ -7,6 +7,7 @@ export interface AuthentificationContextType {
 
   actions: {
     updateUser: (user: User) => void;
+    deleteUser: () => void;
   };
 }
 
@@ -18,10 +19,12 @@ interface Props {
 }
 
 export const AuthentificationProvider = ({ children }: Props) => {
-  const { user, updateUser } = useUser();
+  const { user, deleteUser, updateUser } = useUser();
 
   return (
-    <AuthentificationContext.Provider value={{ user, actions: { updateUser } }}>
+    <AuthentificationContext.Provider
+      value={{ user, actions: { deleteUser, updateUser } }}
+    >
       {children}
     </AuthentificationContext.Provider>
   );
