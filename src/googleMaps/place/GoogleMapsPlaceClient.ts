@@ -1,26 +1,31 @@
-import config from "../../config/config";
-import { Place } from "../domain/Place";
+type AutocompleteServiceType = google.maps.places.AutocompleteService | null;
 
-const baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+const autocompleteService: {
+  instance: AutocompleteServiceType;
+} = { instance: null };
+
+const AutocompleteService = (): google.maps.places.AutocompleteService => {
+  if (!autocompleteService.instance) {
+    autocompleteService.instance = new google.maps.places.AutocompleteService();
+  }
+
+  return autocompleteService.instance;
+};
 
 export const GoogleMapsPlaceClient = {
-  fetchSuggestions: async (address: string): Promise<Place[]> => {
-    const encodedAddress = encodeURIComponent(address);
-    const suggestions: Place[] = [];
+  fetchSuggestions: async (
+    query: string
+  ): Promise<google.maps.places.AutocompletePrediction[]> => {
+    await google.maps.importLibrary("places");
 
-    try {
-      const response = await fetch(
-        `${baseUrl}?input=${encodedAddress}&key=${config.GOOGLE_MAPS_KEY_API}`
-      );
-
-      const data = await response.json();
-      if (data.status === "OK") {
-        console.log(data);
-      }
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-    } finally {
-      return suggestions;
+    if (query === "") {
+      return [];
     }
+
+    const response = await AutocompleteService().getPlacePredictions({
+      input: query,
+    });
+
+    return response.predictions;
   },
 };

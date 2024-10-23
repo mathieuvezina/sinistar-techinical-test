@@ -1,24 +1,27 @@
 import { useState } from "react";
-import { Place } from "../../domain/Place";
 import { GoogleMapsPlaceClient } from "../GoogleMapsPlaceClient";
 
 interface GoogleMapsPlaceSuggestionsHook {
-  suggestions: Place[];
-  fetchSuggestions: (address: string) => void;
+  suggestions: google.maps.places.AutocompletePrediction[];
+  setSuggestions: (
+    suggestions: google.maps.places.AutocompletePrediction[]
+  ) => void;
+  fetchSuggestions: (addressToSearch: string) => void;
 }
 
 export const useGoogleMapsPlaceSuggestions =
   (): GoogleMapsPlaceSuggestionsHook => {
-    const [suggestions, setSuggestions] = useState<Place[]>([]);
+    const [suggestions, setSuggestions] = useState<
+      google.maps.places.AutocompletePrediction[]
+    >([]);
 
-    const fetchSuggestions = async (address: string) => {
-      try {
-        const places = await GoogleMapsPlaceClient.fetchSuggestions(address);
-        setSuggestions(places);
-      } catch (_) {
-        setSuggestions([]);
-      }
+    const fetchSuggestions = async (addressToSearch: string) => {
+      const places = await GoogleMapsPlaceClient.fetchSuggestions(
+        addressToSearch
+      );
+
+      setSuggestions(places as any);
     };
 
-    return { suggestions, fetchSuggestions };
+    return { suggestions, setSuggestions, fetchSuggestions };
   };

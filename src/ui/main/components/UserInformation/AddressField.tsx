@@ -1,29 +1,45 @@
-import { TextField, Autocomplete, Skeleton } from "@mui/material";
+import { TextField, Autocomplete, debounce } from "@mui/material";
+import React from "react";
 import { useGoogleMapsPlaceSuggestions } from "../../../../googleMaps/place/hooks/useGoogleMapsPlaceSuggestions";
-import { useLoadScript } from "@react-google-maps/api";
-import config from "../../../../config/config";
 
 export const AddressField = () => {
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: config.GOOGLE_MAPS_KEY_API,
-    libraries: ["places"],
-  });
-  const { suggestions, fetchSuggestions } = useGoogleMapsPlaceSuggestions();
+  const [value, setValue] =
+    React.useState<google.maps.places.AutocompletePrediction | null>(null);
+  const { suggestions, setSuggestions, fetchSuggestions } =
+    useGoogleMapsPlaceSuggestions();
 
-  if (!isLoaded) {
-    return <Skeleton animation="wave" variant="rectangular" height={58} />;
-  }
+  const handleValueChange = React.useMemo(
+    () =>
+      debounce(
+        (_: React.SyntheticEvent<Element, Event>, inputValue: string) => {
+          fetchSuggestions(inputValue);
+        }
+      ),
+    [fetchSuggestions]
+  );
 
   return (
     <Autocomplete
+      getOptionLabel={(option) =>
+        typeof option === "string" ? option : option.description
+      }
+      filterOptions={(x) => x}
       options={suggestions}
+      autoComplete
+      includeInputInList
+      filterSelectedOptions
+      value={value}
+      noOptionsText="Aucune adresse"
+      onChange={(
+        event: any,
+        newValue: google.maps.places.AutocompletePrediction | null
+      ) => {
+        setSuggestions(newValue ? [newValue, ...suggestions] : suggestions);
+        setValue(newValue);
+      }}
+      onInputChange={handleValueChange}
       renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Votre Adresse"
-          variant="outlined"
-          onChange={(event) => fetchSuggestions(event.target.value)}
-        />
+        <TextField {...params} label="Votre adresse" variant="outlined" />
       )}
     ></Autocomplete>
   );
