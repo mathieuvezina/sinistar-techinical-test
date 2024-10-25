@@ -1,10 +1,10 @@
-import { createContext } from "react";
+import { createContext, useState } from "react";
 import { House } from "../domain/HousingProvider";
 import { HousingProviderSearchCriteria } from "../domain/SearchCriteria";
 import { HousingProviderClient } from "../HousingProviderClient";
 
 export interface HousingProviderContextType {
-  searchCritiria: HousingProviderSearchCriteria;
+  searchCriteria: HousingProviderSearchCriteria;
   houses: House[];
 
   actions: {
@@ -21,27 +21,29 @@ interface Props {
   children: React.ReactNode;
 }
 
-export const HousingProviderProvider = ({ children }: Props) => {
-  const houses: House[] = HousingProviderClient.list();
-  const searchCritiria: HousingProviderSearchCriteria = {
-    distance: 25,
-    hostResponseRate: 25,
-    reviewScore: 25,
-    extensionFlexibility: 25,
-  };
+const defaultSearchCriteria: HousingProviderSearchCriteria = {
+  distance: 25,
+  hostResponseRate: 25,
+  reviewScore: 25,
+  extensionFlexibility: 25,
+};
 
-  const updateSearchCriteriaWeighting = (sc: HousingProviderSearchCriteria) => {
-    searchCritiria.distance = sc.distance;
-    searchCritiria.hostResponseRate = sc.hostResponseRate;
-    searchCritiria.reviewScore = sc.reviewScore;
-    searchCritiria.extensionFlexibility = sc.extensionFlexibility;
+export const HousingProviderProvider = ({ children }: Props) => {
+  const [searchCriteria, setSearchCriteria] =
+    useState<HousingProviderSearchCriteria>(defaultSearchCriteria);
+  const houses: House[] = HousingProviderClient.list();
+
+  const updateSearchCriteriaWeighting = (
+    searchCritiria: HousingProviderSearchCriteria
+  ) => {
+    setSearchCriteria(searchCritiria);
   };
 
   return (
     <HousingProviderContext.Provider
       value={{
         houses,
-        searchCritiria,
+        searchCriteria,
         actions: { updateSearchCriteriaWeighting },
       }}
     >

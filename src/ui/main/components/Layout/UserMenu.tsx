@@ -1,46 +1,65 @@
-import { Menu, MenuItem } from "@mui/material";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 import { useAuthentification } from "../../../../authentification/hooks/useAuthentification";
+import { useState } from "react";
+import { AccountCircle } from "@mui/icons-material";
 
 export interface UserMenuProps {
-  anchor: HTMLButtonElement | null;
-  close: () => void;
   login: () => void;
 }
 
-export const UserMenu = ({ anchor, close, login }: UserMenuProps) => {
+export const UserMenu = ({ login }: UserMenuProps) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
   const { user, actions } = useAuthentification();
-  const open = Boolean(anchor);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleClose = () => {
-    close();
+    setAnchorEl(null);
   };
 
   const handleLogout = () => {
     actions.deleteUser();
-    close();
+    setAnchorEl(null);
   };
 
   return (
-    <Menu
-      id="menu-appbar"
-      anchorEl={anchor}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "right",
-      }}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={open}
-      onClose={handleClose}
-    >
-      {user ? (
-        <MenuItem onClick={handleLogout}>Déconnexion</MenuItem>
-      ) : (
-        <MenuItem onClick={login}>Connexion</MenuItem>
-      )}
-    </Menu>
+    <>
+      <IconButton
+        size="large"
+        aria-label="account of current user"
+        aria-controls="menu-appbar"
+        aria-haspopup="true"
+        color="inherit"
+        onClick={handleClick}
+      >
+        <AccountCircle />
+      </IconButton>
+
+      <Menu
+        id="menu-appbar"
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={open}
+        onClose={handleClose}
+      >
+        {user ? (
+          <MenuItem onClick={handleLogout}>Déconnexion</MenuItem>
+        ) : (
+          <MenuItem onClick={login}>Connexion</MenuItem>
+        )}
+      </Menu>
+    </>
   );
 };

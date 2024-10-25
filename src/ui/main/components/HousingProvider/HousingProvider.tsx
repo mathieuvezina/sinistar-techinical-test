@@ -19,7 +19,7 @@ export const HousingProvider = () => {
       </Typography>
       <ul>
         {houses.map((house) => (
-          <HouseItem house={house} />
+          <HouseItem key={house.id} house={house} />
         ))}
       </ul>
     </Box>

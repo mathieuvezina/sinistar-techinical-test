@@ -70,7 +70,6 @@ export const GoogleMapsPlaceClient = {
             place.geometry &&
             place.geometry.location
           ) {
-            console.log("place.geometry.location", place.geometry.location);
             resolve({
               latitude: place.geometry.location.lat(),
               longitude: place.geometry.location.lng(),
