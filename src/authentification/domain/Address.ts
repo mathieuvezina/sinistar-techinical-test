@@ -1,6 +1,7 @@
+import { Place } from "../../googleMaps/domain/Place";
+
 export interface Address {
-  address: string;
-  city: string;
+  place: Place;
   latitude: number;
   longitude: number;
 }

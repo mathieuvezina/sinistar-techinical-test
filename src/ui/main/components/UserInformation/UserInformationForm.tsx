@@ -1,16 +1,27 @@
 import { Box, TextField, Button } from "@mui/material";
 import { useUserInformationForm } from "./hooks/useUserInformationForm";
 import { AddressField } from "./AddressField";
+import { Place } from "../../../../googleMaps/domain/Place";
+import React from "react";
 
 interface Props {
-  close: () => void;
+  submit: (name: string, place: Place) => void;
 }
 
-export const UserInformationForm = ({ close }: Props) => {
-  const { isFormValid, name, updateName } = useUserInformationForm();
+export const UserInformationForm = ({ submit }: Props) => {
+  const { isFormValid, address, name, updateName, updateAddress } =
+    useUserInformationForm();
 
-  const handleSubmit = () => {
-    close();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (isFormValid && address !== null) {
+      submit(name, address);
+    }
+  };
+
+  const handlePlaceChange = (place: Place | null) => {
+    updateAddress(place);
   };
 
   return (
@@ -22,9 +33,14 @@ export const UserInformationForm = ({ close }: Props) => {
           gap: 2,
         }}
       >
-        <TextField label="Votre Nom" value={name} onChange={updateName} />
+        <TextField
+          autoComplete="off"
+          label="Votre Nom"
+          value={name}
+          onChange={updateName}
+        />
 
-        <AddressField />
+        <AddressField placeChange={handlePlaceChange} />
 
         <Button
           sx={{ ml: "auto" }}

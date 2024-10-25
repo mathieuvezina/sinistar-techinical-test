@@ -17,6 +17,7 @@ export const UserMenu = ({ anchor, close, login }: UserMenuProps) => {
 
   const handleLogout = () => {
     actions.deleteUser();
+    close();
   };
 
   return (

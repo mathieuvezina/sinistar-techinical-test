@@ -26,7 +26,9 @@ export const Layout = () => {
       <AppBar position="static">
         <ToolbarContainer login={handleLogin} />
       </AppBar>
-      <Typography variant="h2">Bienvenue!</Typography>
+      <Typography sx={{ mt: "1em" }} variant="h2">
+        Bienvenue!
+      </Typography>
 
       <UserInformationModal
         open={shouldOpenningUserInformationModal}

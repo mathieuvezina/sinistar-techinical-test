@@ -1,10 +1,14 @@
 import { TextField, Autocomplete, debounce } from "@mui/material";
 import React from "react";
 import { useGoogleMapsPlaceSuggestions } from "../../../../googleMaps/place/hooks/useGoogleMapsPlaceSuggestions";
+import { Place } from "../../../../googleMaps/domain/Place";
 
-export const AddressField = () => {
-  const [value, setValue] =
-    React.useState<google.maps.places.AutocompletePrediction | null>(null);
+interface Props {
+  placeChange: (place: Place | null) => void;
+}
+
+export const AddressField = ({ placeChange }: Props) => {
+  const [value, setValue] = React.useState<Place | null>(null);
   const { suggestions, setSuggestions, fetchSuggestions } =
     useGoogleMapsPlaceSuggestions();
 
@@ -18,6 +22,12 @@ export const AddressField = () => {
     [fetchSuggestions]
   );
 
+  const handleSelectPlace = (_: React.SyntheticEvent, place: Place | null) => {
+    setSuggestions(place ? [place, ...suggestions] : suggestions);
+    setValue(place);
+    placeChange(place);
+  };
+
   return (
     <Autocomplete
       getOptionLabel={(option) =>
@@ -30,13 +40,7 @@ export const AddressField = () => {
       filterSelectedOptions
       value={value}
       noOptionsText="Aucune adresse"
-      onChange={(
-        event: any,
-        newValue: google.maps.places.AutocompletePrediction | null
-      ) => {
-        setSuggestions(newValue ? [newValue, ...suggestions] : suggestions);
-        setValue(newValue);
-      }}
+      onChange={handleSelectPlace}
       onInputChange={handleValueChange}
       renderInput={(params) => (
         <TextField {...params} label="Votre adresse" variant="outlined" />

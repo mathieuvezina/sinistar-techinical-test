@@ -1,5 +1,7 @@
 import { Modal, Box, Typography } from "@mui/material";
 import { UserInformationForm } from "./UserInformationForm";
+import { Place } from "../../../../googleMaps/domain/Place";
+import { useAuthentification } from "../../../../authentification/hooks/useAuthentification";
 
 interface Props {
   open: boolean;
@@ -7,11 +9,14 @@ interface Props {
 }
 
 export const UserInformationModal = ({ close, open }: Props) => {
+  const { actions } = useAuthentification();
+
   const handleClose = () => {
     close();
   };
 
-  const handleSaveUserInformation = () => {
+  const handleSaveUserInformation = async (name: string, place: Place) => {
+    await actions.updateUser(name, place);
     close();
   };
 
@@ -37,7 +42,7 @@ export const UserInformationModal = ({ close, open }: Props) => {
           Veuillez saisir votre nom ainsi que votre adresse. Ceci nous
           permettera de vous trouver la meilleure résidence pour vous loger
         </Typography>
-        <UserInformationForm close={handleSaveUserInformation} />
+        <UserInformationForm submit={handleSaveUserInformation} />
       </Box>
     </Modal>
   );

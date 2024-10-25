@@ -1,12 +1,13 @@
 import { createContext } from "react";
 import { User } from "../domain/User";
 import { useUser } from "../hooks/useUser";
+import { Place } from "../../googleMaps/domain/Place";
 
 export interface AuthentificationContextType {
   user: User | null;
 
   actions: {
-    updateUser: (user: User) => void;
+    updateUser: (name: string, place: Place) => void;
     deleteUser: () => void;
   };
 }
