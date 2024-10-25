@@ -1,9 +1,11 @@
-import { AppBar, Typography } from "@mui/material";
+import { AppBar, Container, Typography } from "@mui/material";
 import { useAuthentification } from "../../authentification/hooks/useAuthentification";
-import { Container } from "./components/Layout/Container";
+import { AppContainer } from "./components/Layout/AppContainer";
 import { useState } from "react";
 import { ToolbarContainer } from "./components/Layout/Toolbar";
 import { UserInformationModal } from "./components/UserInformation/UserInformationModal";
+import { HousingProviderProvider } from "../../housingProvider/context/HousingProviderContext";
+import { HousingProvider } from "./components/HousingProvider/HousingProvider";
 
 export const Layout = () => {
   const [isUserInformationModalOpen, setIsUserInformationModalOpen] =
@@ -22,18 +24,26 @@ export const Layout = () => {
     user === null || isUserInformationModalOpen;
 
   return (
-    <Container>
-      <AppBar position="static">
-        <ToolbarContainer login={handleLogin} />
-      </AppBar>
-      <Typography sx={{ mt: "1em" }} variant="h2">
-        Bienvenue!
-      </Typography>
-
-      <UserInformationModal
-        open={shouldOpenningUserInformationModal}
-        close={handleCloseUserInformationModal}
-      />
-    </Container>
+    <HousingProviderProvider>
+      <AppContainer>
+        <AppBar position="static">
+          <ToolbarContainer login={handleLogin} />
+        </AppBar>
+        <Container
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "3em",
+          }}
+        >
+          <Typography variant="h2">Bienvenue!</Typography>
+          {user && <HousingProvider />}
+        </Container>
+        <UserInformationModal
+          open={shouldOpenningUserInformationModal}
+          close={handleCloseUserInformationModal}
+        />
+      </AppContainer>
+    </HousingProviderProvider>
   );
 };

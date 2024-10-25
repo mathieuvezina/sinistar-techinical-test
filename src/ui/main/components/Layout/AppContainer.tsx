@@ -5,7 +5,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-export const Container = ({ children }: Props) => {
+export const AppContainer = ({ children }: Props) => {
   return (
     <Box
       sx={{
@@ -14,6 +14,7 @@ export const Container = ({ children }: Props) => {
         alignItems: "center",
         justifyContent: "flex-start",
         minHeight: "100vh",
+        gap: "2em",
       }}
     >
       {children}
