@@ -1,11 +1,14 @@
-import { createContext, useState } from "react";
-import { House } from "../domain/HousingProvider";
+import { createContext, useEffect, useState } from "react";
+import { HouseWithDistance } from "../domain/HousingProvider";
 import { HousingProviderSearchCriteria } from "../domain/SearchCriteria";
 import { HousingProviderClient } from "../HousingProviderClient";
+import { useAuthentification } from "../../authentification/hooks/useAuthentification";
+import { HousingProviderSorter } from "../sorter/HousingProviderSorter";
+import { debounce } from "@mui/material";
 
 export interface HousingProviderContextType {
   searchCriteria: HousingProviderSearchCriteria;
-  houses: House[];
+  houses: HouseWithDistance[];
 
   actions: {
     updateSearchCriteriaWeighting: (
@@ -29,14 +32,40 @@ const defaultSearchCriteria: HousingProviderSearchCriteria = {
 };
 
 export const HousingProviderProvider = ({ children }: Props) => {
+  const { user } = useAuthentification();
   const [searchCriteria, setSearchCriteria] =
     useState<HousingProviderSearchCriteria>(defaultSearchCriteria);
-  const houses: House[] = HousingProviderClient.list();
+  const [houses, setHouses] = useState<HouseWithDistance[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      const { latitude, longitude } = user.address;
+      const houses = HousingProviderClient.listWithDistanceFromStartPoint({
+        latitude,
+        longitude,
+      });
+
+      updateHouses(houses, searchCriteria);
+    }
+  }, [user]);
 
   const updateSearchCriteriaWeighting = (
-    searchCritiria: HousingProviderSearchCriteria
+    searchCriteria: HousingProviderSearchCriteria
   ) => {
-    setSearchCriteria(searchCritiria);
+    setSearchCriteria(searchCriteria);
+    updateHouses(houses, searchCriteria);
+  };
+
+  const updateHouses = (
+    houses: HouseWithDistance[],
+    searchCriteria: HousingProviderSearchCriteria
+  ) => {
+    const sortedHouses = HousingProviderSorter.sortHousesBySearchCriteria(
+      houses,
+      searchCriteria
+    );
+
+    setHouses(sortedHouses);
   };
 
   return (

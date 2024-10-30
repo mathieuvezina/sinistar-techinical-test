@@ -1,6 +1,6 @@
 import { HousingProviderSearchCriteria } from "../domain/SearchCriteria";
 
-export const adjustWeightDistribution = (
+export const adjustWeightDistributionOnHundred = (
   changedKey: keyof HousingProviderSearchCriteria,
   newValue: number,
   currentCriteria: HousingProviderSearchCriteria

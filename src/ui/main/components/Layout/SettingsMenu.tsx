@@ -1,5 +1,6 @@
 import { Settings } from "@mui/icons-material";
 import {
+  Button,
   IconButton,
   Menu,
   MenuItem,
@@ -10,7 +11,7 @@ import {
 import { useHousingProvider } from "../../../../housingProvider/hooks/useHousingProvider";
 import { useCallback, useState } from "react";
 import { HousingProviderSearchCriteria } from "../../../../housingProvider/domain/SearchCriteria";
-import { adjustWeightDistribution } from "../../../../housingProvider/helpers/criteriaHelpers";
+// import { adjustWeightDistributionOnHundred } from "../../../../housingProvider/helpers/criteriaHelpers";
 
 const criteriaConfig = [
   { key: "distance" as const, label: "Distance" },
@@ -20,7 +21,10 @@ const criteriaConfig = [
 ];
 
 export const SettingsMenu = () => {
-  const { searchCriteria: searchCritiria, actions } = useHousingProvider();
+  const { searchCriteria: defaultSearchCriteria, actions } =
+    useHousingProvider();
+  const [searchCriteria, setSearchCriteria] =
+    useState<HousingProviderSearchCriteria>(defaultSearchCriteria);
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -34,6 +38,11 @@ export const SettingsMenu = () => {
     setAnchorEl(null);
   };
 
+  const handleSaveSearchCriteria = () => {
+    actions.updateSearchCriteriaWeighting(searchCriteria);
+    setAnchorEl(null);
+  };
+
   const handleSliderChange = useCallback(
     (key: keyof HousingProviderSearchCriteria) =>
       (event: Event, newValue: number | number[]) => {
@@ -41,17 +50,21 @@ export const SettingsMenu = () => {
           typeof newValue === "number"
             ? Math.round(newValue)
             : Math.round(newValue[0]);
-        const newCriteria = adjustWeightDistribution(
-          key,
-          value,
-          searchCritiria
-        );
-        actions.updateSearchCriteriaWeighting(newCriteria);
-      },
-    [searchCritiria, actions]
-  );
 
-  const total = Object.values(searchCritiria).reduce((a, b) => a + b, 0);
+        const newCriteria = { ...searchCriteria };
+        newCriteria[key] = Math.round(value);
+
+        // If you want having all Criteria base on 100 use adjustWeightDistributionOnHundred
+        // const newCriteria = adjustWeightDistribution(
+        //   key,
+        //   value,
+        //   searchCriteria
+        // );
+
+        setSearchCriteria(newCriteria);
+      },
+    [searchCriteria, setSearchCriteria]
+  );
 
   return (
     <>
@@ -85,10 +98,10 @@ export const SettingsMenu = () => {
           >
             <Stack spacing={1} sx={{ width: "100%" }}>
               <Typography>
-                {label}: {searchCritiria[key]}%
+                {label}: {searchCriteria[key]}%
               </Typography>
               <Slider
-                value={searchCritiria[key]}
+                value={searchCriteria[key]}
                 onChange={handleSliderChange(key)}
                 aria-labelledby={`${key}-slider`}
                 valueLabelDisplay="auto"
@@ -109,9 +122,11 @@ export const SettingsMenu = () => {
             display: "block",
             color: "text.secondary",
           }}
-        >
-          Total: {total}%
-        </Typography>
+        ></Typography>
+
+        <Button variant="contained" onClick={handleSaveSearchCriteria}>
+          Enregistrer
+        </Button>
       </Menu>
     </>
   );

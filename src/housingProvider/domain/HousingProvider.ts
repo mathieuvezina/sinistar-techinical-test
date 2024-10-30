@@ -9,3 +9,7 @@ export interface House {
   review_score: number;
   extension_flexibility: number;
 }
+
+export interface HouseWithDistance extends House {
+  distance: number;
+}
